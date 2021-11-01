@@ -7,13 +7,12 @@ import "time"
 import "math/rand"
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	//test_db()
 	test_server()
 }
 
 func test_db() {
-	rand.Seed(time.Now().UnixNano())
-
 	//Initialise a DB and connect to it
 	err := gochoose.InitDB("example.db")
 	fmt.Println(err)
@@ -44,6 +43,12 @@ func test_db() {
 }
 
 func test_server() {
-	srv := gochoose.NewCYOAServer("", 8080)
-	srv.ListenAndServe()
+	//Initialise a DB and connect to it
+	err := gochoose.InitDB("example.db")
+	fmt.Println(err)
+	db,err := gochoose.OpenDB("example.db")
+	fmt.Println(err)
+	
+	srv := gochoose.NewCYOAServer("", 8080, db)
+	srv.Server.ListenAndServe()
 }

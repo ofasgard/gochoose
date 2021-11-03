@@ -49,6 +49,14 @@ func test_server() {
 	db,err := gochoose.OpenDB("example.db")
 	fmt.Println(err)
 	
-	srv := gochoose.NewCYOAServer("", 8080, db)
-	srv.Server.ListenAndServe()
+	stage := gochoose.NewStartStage()
+	stage.Body = "<i>Here is some italic text.</i>"
+	stage.Links["Google"] = "https://www.google.com"
+	gochoose.SaveStage(db, stage)
+	
+	srv,err := gochoose.NewCYOAServer("", 8080, db, "example.html")
+	fmt.Println(err)
+	if err == nil {
+		srv.Server.ListenAndServe()
+	}
 }

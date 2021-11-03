@@ -125,6 +125,12 @@ func NewStage() Stage {
 	return s
 }
 
+func NewStartStage() Stage {
+	stage := NewStage()
+	stage.ID,_ = uuid.Parse("00000000-0000-0000-0000-000000000000")
+	return stage
+}
+
 func SaveStage(db *bolt.DB, stage Stage) error {
 	err := db.Update(func(tx *bolt.Tx) error {
 		id_str := stage.ID.String()

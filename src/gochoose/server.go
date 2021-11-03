@@ -5,26 +5,35 @@ import "github.com/google/uuid"
 
 import "fmt"
 import "net/http"
+import "html/template"
 
 type CYOAServer struct {
 	Server *http.Server
 	DB *bolt.DB
+	Template *template.Template
 }
 
-func NewCYOAServer(host string, port int, db *bolt.DB) *CYOAServer {
+type CYOAFields struct {
+	Body template.HTML
+	Links template.HTML
+}
+
+func NewCYOAServer(host string, port int, db *bolt.DB, template_path string) (*CYOAServer,error) {
 	srv := CYOAServer{}
 	srv.Server = &http.Server{}
 	srv.Server.Addr = fmt.Sprintf("%s:%d", host, port)
 	http.HandleFunc("/", srv.CYOAHandler)
 	srv.DB = db
-	return &srv
+	t,err := template.ParseFiles(template_path)
+	srv.Template = t
+	return &srv,err
 }
 
 func (s *CYOAServer) CYOAHandler(w http.ResponseWriter, r *http.Request) {
 	user := CookieHandler(w, r, s.DB)
 	switch r.Method {
 		case "GET":
-			GetHandler(w, r, s.DB, user)
+			GetHandler(w, r, s.DB, s.Template, user)
 		case "POST":
 			fmt.Fprintf(w, "POST")
 		default:
@@ -67,7 +76,7 @@ func CookieHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) User {
 	return user
 }
 
-func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, user User) {
+func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, tp *template.Template, user User) {
 	//Check if the progress stage associated with this user actually exists.
 	stage_id := user.Progress
 	stage, err := LoadStage(db, stage_id)
@@ -77,7 +86,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, user User) 
 		return
 	}
 	//If it does, construct the HTML for this stage.
-	//TODO
-	fmt.Fprintf(w, "NOT IMPLEMENTED")
-	fmt.Println(stage)
+	fields := CYOAFields{}
+	fields.Body = template.HTML(stage.Body)
+	fields.Links = "TODO"
+	tp.Execute(w, fields)
 }

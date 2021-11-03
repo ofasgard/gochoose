@@ -84,7 +84,7 @@ func LoadUser(db *bolt.DB, id uuid.UUID) (User,error) {
 type Stage struct {
 	ID uuid.UUID // The unique UUID for this stage. The "progress" value of the User struct acts as a foreign key for this identified.
 	Body string // The contents of this stage's HTML body.
-	Links [][]string // A slice of slices, containing the possible options to progress from this stage. Each element contains ["text", "link"].
+	Links [][]string // A slice of slices, containing the possible options to progress from this stage. Each element contains ["text", "uuid"].
 }
 
 func (s Stage) ToJSON() ([]byte,error) {
@@ -122,7 +122,7 @@ func (s Stage) GenerateLinks() string {
 	for _, values := range s.Links {
 		text := values[0]
 		link := values[1]
-		htmlcontent += fmt.Sprintf("<a href=\"%s\">%s</a><br />\n", link, text)
+		htmlcontent += fmt.Sprintf("<a href=\"/?progress=%s\">%s</a><br />\n", link, text)
 	}
 	return htmlcontent
 }

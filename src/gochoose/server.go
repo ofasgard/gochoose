@@ -4,6 +4,7 @@ import bolt "go.etcd.io/bbolt"
 import "github.com/google/uuid"
 
 import "fmt"
+import "net/url"
 import "net/http"
 import "html/template"
 
@@ -75,6 +76,12 @@ func CookieHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB) User {
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, tp *template.Template, user User) {
+	//Check if the user's progress should be updated based on the request URI.
+	ProgressHandler(db, user, r.URL.Query())
+	user,err := LoadUser(db, user.ID)
+	if err != nil {
+		fmt.Fprintf(w, "ERROR: COULD NOT UPDATE USER PROGRESS [%s]", user.ID.String())
+	}
 	//Check if the progress stage associated with this user actually exists.
 	stage_id := user.Progress
 	stage, err := LoadStage(db, stage_id)
@@ -88,4 +95,26 @@ func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, tp *templat
 	fields.Body = template.HTML(stage.Body)
 	fields.Links = template.HTML(stage.GenerateLinks())
 	tp.Execute(w, fields)
+}
+
+func ProgressHandler(db *bolt.DB, user User, params url.Values) {
+	//Check if progress parameter is present.
+	progress, ok := params["progress"]
+	if (!ok) {
+		return
+	}
+	//Check if progress parameter is a valid UUID.
+	progress_id,err := uuid.Parse(progress[0])
+	if (err != nil) {
+		return
+	}
+	//Check if progress UUID map to a valid stage.
+	stage,err := LoadStage(db, progress_id)
+	if (err != nil) {
+		return
+	}
+	//Update the user's progress with the new stage UUID and save the user.
+	user.Progress = stage.ID
+	SaveUser(db, user)
+	return
 }

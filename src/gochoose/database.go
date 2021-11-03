@@ -84,13 +84,13 @@ func LoadUser(db *bolt.DB, id uuid.UUID) (User,error) {
 type Stage struct {
 	ID uuid.UUID // The unique UUID for this stage. The "progress" value of the User struct acts as a foreign key for this identified.
 	Body string // The contents of this stage's HTML body.
-	Links map[string]string // A map containing the possible options to progress from this stage. Key is the flavor text, value is the link itself.
+	Links [][]string // A slice of slices, containing the possible options to progress from this stage. Each element contains ["text", "link"].
 }
 
 func (s Stage) ToJSON() ([]byte,error) {
 	data := struct {
 		Body string
-		Links map[string]string
+		Links [][]string
 	} { 
 		s.Body,
 		s.Links,
@@ -102,7 +102,7 @@ func (s Stage) ToJSON() ([]byte,error) {
 func (s *Stage) FromJSON(j []byte) error {
 	data := struct {
 		Body string
-		Links map[string]string
+		Links [][]string
 	} { 
 		"",
 		nil,
@@ -119,7 +119,9 @@ func (s *Stage) FromJSON(j []byte) error {
 
 func (s Stage) GenerateLinks() string {
 	htmlcontent := ""
-	for text, link := range s.Links {
+	for _, values := range s.Links {
+		text := values[0]
+		link := values[1]
 		htmlcontent += fmt.Sprintf("<a href=\"%s\">%s</a><br />\n", link, text)
 	}
 	return htmlcontent
@@ -129,7 +131,7 @@ func NewStage() Stage {
 	s := Stage{}
 	s.ID = uuid.New()
 	s.Body = "<b>ERROR - NO CONTENT</b>"
-	s.Links = make(map[string]string)
+	s.Links = make([][]string, 0)
 	return s
 }
 

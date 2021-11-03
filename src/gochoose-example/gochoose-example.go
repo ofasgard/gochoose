@@ -21,9 +21,9 @@ func test_server() {
 	//Create a simple stage for users to land on.
 	stage := gochoose.NewStartStage()
 	stage.Body = "<i>Here is some italic text.</i>"
-	stage.Links["Here's an option."] = "https://google.com"
-	stage.Links["Here's another option."] = "http://neopets.com"
-	stage.Links["A third option."] = "https://duckduckgo.com"
+	stage.Links= append(stage.Links, []string{"Here's an option.", "https://google.com"})
+	stage.Links= append(stage.Links, []string{"Here's another option.", "https://bing.com"})
+	stage.Links= append(stage.Links, []string{"Here's a third option.", "https://duckduckgo.com"})
 	gochoose.SaveStage(db, stage)
 	
 	//Create the server using an example template.
@@ -35,5 +35,4 @@ func test_server() {
 }
 
 //todo:
-//update links structure so that it's a slice, not an unordered map
 //implement update/choicemaking logic

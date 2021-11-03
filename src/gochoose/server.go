@@ -34,8 +34,6 @@ func (s *CYOAServer) CYOAHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 		case "GET":
 			GetHandler(w, r, s.DB, s.Template, user)
-		case "POST":
-			fmt.Fprintf(w, "POST")
 		default:
 			fmt.Println(user)
 			fmt.Fprintf(w, "NOT IMPLEMENTED")

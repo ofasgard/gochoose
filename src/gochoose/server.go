@@ -88,6 +88,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request, db *bolt.DB, tp *templat
 	//If it does, construct the HTML for this stage.
 	fields := CYOAFields{}
 	fields.Body = template.HTML(stage.Body)
-	fields.Links = "TODO"
+	fields.Links = template.HTML(stage.GenerateLinks())
 	tp.Execute(w, fields)
 }

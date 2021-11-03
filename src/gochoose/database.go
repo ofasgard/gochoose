@@ -117,6 +117,14 @@ func (s *Stage) FromJSON(j []byte) error {
 	return nil
 }
 
+func (s Stage) GenerateLinks() string {
+	htmlcontent := ""
+	for text, link := range s.Links {
+		htmlcontent += fmt.Sprintf("<a href=\"%s\">%s</a><br />\n", link, text)
+	}
+	return htmlcontent
+}
+
 func NewStage() Stage {
 	s := Stage{}
 	s.ID = uuid.New()

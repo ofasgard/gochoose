@@ -29,7 +29,7 @@ func test_server() {
 	gochoose.SaveStage(db, second_stage)
 	
 	//Create a linkage from first stage to second stage.
-	stage.Links = append(stage.Links, []string{"Click here to progress to stage two.", second_stage.ID.String()})
+	stage.AddLink(second_stage, "Click here to progress to stage two.")
 	gochoose.SaveStage(db, stage)
 	
 	//Create the server using an example template.
@@ -40,6 +40,3 @@ func test_server() {
 	}
 }
 
-
-//add helper function so you don't have to manually append or delete from stage.Links
-//maybe something that's just like "LinkStages(source, origin, text)" that automagically does all the lifting in the background

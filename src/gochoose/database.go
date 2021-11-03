@@ -127,6 +127,11 @@ func (s Stage) GenerateLinks() string {
 	return htmlcontent
 }
 
+func (s *Stage) AddLink(destination Stage, text string) {
+	link := []string{text, destination.ID.String()}
+	s.Links = append(s.Links, link)
+}
+
 func NewStage() Stage {
 	s := Stage{}
 	s.ID = uuid.New()

@@ -1,6 +1,6 @@
 package main
 
-import "gochoose"
+import "github.com/ofasgard/gochoose"
 
 import "fmt"
 import "time"
@@ -54,7 +54,7 @@ func main() {
 	gochoose.SaveStage(db, end_stage)
 	
 	//Create the server using an example template.
-	srv,err := gochoose.NewCYOAServer("", 8080, db, "src/gochoose-example/example.html")
+	srv,err := gochoose.NewCYOAServer("", 8080, db, "res/example.html")
 	if (err != nil) {
 		fmt.Println(err)
 		return
